@@ -1,0 +1,22 @@
+{
+  "name": "fbtraffic-tools",
+  "description": "FbTraffic tools",
+  "version": "2.0.1",
+  "author": "TienDang",
+  "license": "TienDang License",
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.27.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.1.0",
+    "gulp-clean": "^0.3.2",
+    "gulp-install": "^1.1.0",
+    "gulp-open": "^2.1.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.3"
+  },
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "jquery": "^3.4.0",
+    "perfect-scrollbar": "^1.4.0"
+  }
+}

@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block page_content %}
+    {{ form_start(form, {'attr': {'id': 'form_filter_email', 'class': 'form-horizontal'}}) }}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card ">
+                <div class="card-header card-header-rose card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">mail_outline</i>
+                    </div>
+                    <h4 class="card-title">Emails</h4>
+                </div>
+                <div class="card-body ">
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label">{{ form_label(form.emails) }}</label>
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                {{ form_widget(form.emails) }}
+                                <span class="bmd-help">List emails need filter</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-fill btn-rose">
+                        <i class="material-icons">filter_list</i> Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card ">
+                <div class="card-header card-header-info card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">vpn_lock</i>
+                    </div>
+                    <h4 class="card-title">Domain emails support</h4>
+                </div>
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                {{ form_widget(form.domain_support) }}
+                                {% for domain in form.domain_support.vars.data %}
+                                    <p class="form-control-static">{{ domain }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card ">
+                <div class="card-header card-header-warning card-header-icon">
+                    <div class="card-icon">
+                        <i class="material-icons">error</i>
+                    </div>
+                    <h4 class="card-title">Note</h4>
+                </div>
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <p class="text-info">
+                                    List emails input by format
+                                </p>
+                                <p class="text-primary">
+                                    lorem@yahoo.com <br>
+                                    lorem@yahoo.com.vn <br>
+                                    lusum@yahoo.com.vn <br>
+                                    lorem@hotmail.com <br>
+                                    lorem@outlook.com <br>
+                                    lorem.clone@yahoo.com <br>
+                                    lorem.test@yahoo.com.vn <br>
+                                    lusum+01@yahoo.com.vn <br>
+                                    lorem.via@hotmail.com <br>
+                                    lorem_99@outlook.com <br>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+
+    {% if results is not empty %}
+        <div class="row">
+            {% for domain, result in results %}
+                <div class="col-md-3">
+                    <div class="card ">
+                        <div class="card-header card-header-success card-header-icon">
+                            <div class="card-icon">
+                                Total: {{ result | length }}
+                            </div>
+                            <h4 class="card-title">{{ domain }}</h4>
+                        </div>
+                        <div class="card-body ">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                    <textarea readonly class="form-control" rows="10"
+                                              cols="50">{{ result | join('\r\n') }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
