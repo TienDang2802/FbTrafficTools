@@ -14,8 +14,16 @@ class FilterEmailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('emails', Type\TextareaType::class, [
-                'label' => 'List emails',
+            ->add('format', Type\TextType::class, [
+                'label' => 'Format',
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+                'data' => 'email|uid'
+            ])
+            ->add('lst_filter', Type\TextareaType::class, [
+                'label' => 'List need filter',
                 'required' => true,
                 'attr' => [
                     'class' => 'form-control',
@@ -23,7 +31,7 @@ class FilterEmailType extends AbstractType
                     'cols' => 50
                 ],
             ])
-            ->add('domain_support', Type\CollectionType::class, [
+            ->add('support_domains', Type\CollectionType::class, [
                 'required' => false,
                 'entry_type' => Type\HiddenType::class,
                 'entry_options' => ['label' => false],
@@ -32,8 +40,7 @@ class FilterEmailType extends AbstractType
                 'by_reference' => false,
                 'label' => false,
                 'data' => [
-                    'yahoo.com.us',
-                    'yahoo.com.vn',
+                    'yahoo.*',
                     'hotmail.com',
                     'outlook.com',
                 ]

@@ -30,16 +30,29 @@ class FilterEmailController extends AbstractController
         $results = [];
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $emailsInput = trim($data['emails'] ?? '');
-            $domainSupport = $data['domain_support'] ?? [];
+            $format = explode('|', $data['format']);
+            $lengthFormat = count($format);
 
-            $emails = preg_split('~[\r\n\s]+~', $emailsInput);
+            $lstFilter = trim($data['lst_filter'] ?? '');
+            $supportDomains = $data['support_domains'] ?? [];
 
-            foreach ($emails as $email) {
-                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    list(, $domain) = explode('@', $email);
-                    if (\in_array($domain, $domainSupport)) {
-                        $results[$domain][] = $email;
+            $lines = preg_split('~[\r\n\s]+~', $lstFilter);
+
+            $regexPattern = '/^([a-z][a-z0-9_\.\+]{3,39}@(%s))/';
+
+            foreach ($supportDomains as $supportDomain) {
+                $results[$supportDomain] = [];
+            }
+
+            foreach ($lines as $line) {
+                $line = array_pad(explode('|', $line), $lengthFormat, null);
+                $data = array_combine($format, $line);
+                if (filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                    foreach ($supportDomains as $supportDomain) {
+                        $regex = sprintf($regexPattern, trim($supportDomain, '*'));
+                        if (preg_match($regex, $data['email'])) {
+                            $results[$supportDomain][] = implode('|', $line);
+                        }
                     }
                 }
             }
