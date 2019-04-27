@@ -48,8 +48,8 @@ class FilterEmailType extends AbstractType
                 'label' => false,
                 'data' => [
                     'yahoo.*',
-                    'hotmail.com',
-                    'outlook.com',
+                    'hotmail.*',
+                    'outlook.*',
                 ]
             ]);
     }
