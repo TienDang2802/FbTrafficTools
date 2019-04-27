@@ -4,6 +4,7 @@ namespace App\Controller\Tools;
 
 use App\Form\Type;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
@@ -71,6 +72,9 @@ class FilterEmailController extends Controller
                         }
                     }
                 }
+
+                $filesystem = new Filesystem();
+                $filesystem->remove($uploadFile->getRealPath());
             } catch (Exception $e) {
                 $errors[] = $e->getMessage();
             } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
