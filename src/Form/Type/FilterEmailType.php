@@ -50,6 +50,7 @@ class FilterEmailType extends AbstractType
                     'yahoo.*',
                     'hotmail.*',
                     'outlook.*',
+                    'gmail.*',
                 ]
             ]);
     }
