@@ -1,11 +1,25 @@
 {% extends 'base.html.twig' %}
 
 {% block before_js %}
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js" ></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
 {% endblock %}
 
 {% block page_content %}
-    {{ form_start(form, {'attr': {'id': 'form_filter_email', 'class': 'form-horizontal'}}) }}
+    {% if errors is not empty %}
+        <div class="alert alert-rose alert-with-icon" data-notify="container">
+            <i class="material-icons" data-notify="icon">notifications</i>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <i class="material-icons">close</i>
+            </button>
+            <span data-notify="icon" class="now-ui-icons ui-1_bell-53"></span>
+            {% for error in errors %}
+                <span data-notify="message">{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {{ form_start(form, {'attr': {'id': 'form_filter_email', 'class': 'form-horizontal', 'enctype': 'multipart/form-data'}}) }}
     <div class="row">
         <div class="col-md-8">
             <div class="card ">
@@ -17,19 +31,16 @@
                 </div>
                 <div class="card-body ">
                     <div class="row">
-                        <label class="col-sm-2 col-form-label">{{ form_label(form.format) }}</label>
+                        <label class="col-sm-2 col-form-label">{{ form_label(form.upload_file) }}</label>
                         <div class="col-sm-10">
-                            <div class="form-group">
-                                {{ form_widget(form.format) }}
-                            </div>
+                            {{ form_widget(form.upload_file) }}
                         </div>
                     </div>
                     <div class="row">
-                        <label class="col-sm-2 col-form-label">{{ form_label(form.lst_filter) }}</label>
+                        <label class="col-sm-2 col-form-label">{{ form_label(form.output_format) }}</label>
                         <div class="col-sm-10">
                             <div class="form-group">
-                                {{ form_widget(form.lst_filter) }}
-                                <span class="bmd-help">List emails need filter</span>
+                                {{ form_widget(form.output_format) }}
                             </div>
                         </div>
                     </div>
@@ -75,19 +86,12 @@
                         <div class="col-md-9">
                             <div class="form-group">
                                 <p class="text-info">
-                                    List emails input by format
+                                    Output format
                                 </p>
                                 <p class="text-primary">
-                                    lorem@yahoo.com <br>
-                                    lorem@yahoo.com.vn <br>
-                                    lusum@yahoo.com.vn <br>
-                                    lorem@hotmail.com <br>
-                                    lorem@outlook.com <br>
-                                    lorem.clone@yahoo.com <br>
-                                    lorem.test@yahoo.com.vn <br>
-                                    lusum+01@yahoo.com.vn <br>
-                                    lorem.via@hotmail.com <br>
-                                    lorem_99@outlook.com <br>
+                                    uid|email <br>
+                                    email|uid <br>
+                                    email|uid|birthday <br>
                                 </p>
                             </div>
                         </div>
@@ -116,7 +120,8 @@
                                         </li>
                                         {% if result | length > 0 %}
                                             <li class="nav-item">
-                                                <a id="{{ domain }}" download="{{ domain }}.txt" class="nav-link"
+                                                <a id="{{ domain }}" download="{{ domain ~ "now"|date("d_m_Y") }}.txt"
+                                                   class="nav-link"
                                                    href="javascript:void(0)"
                                                    data-toggle="tab">
                                                     <i class="material-icons">cloud_download</i>

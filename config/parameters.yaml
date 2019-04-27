@@ -1,0 +1,2 @@
+parameters:
+    file_upload_dir: '%kernel.project_dir%/public/uploads/files'

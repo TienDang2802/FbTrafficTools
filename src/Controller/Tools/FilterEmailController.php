@@ -3,14 +3,16 @@
 namespace App\Controller\Tools;
 
 use App\Form\Type;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use Symfony\Component\HttpFoundation;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/tools")
  */
-class FilterEmailController extends AbstractController
+class FilterEmailController extends Controller
 {
     /**
      * @Route(
@@ -22,45 +24,64 @@ class FilterEmailController extends AbstractController
      *
      * @return HttpFoundation\Response
      */
-    public function index(HttpFoundation\Request $request): HttpFoundation\Response
-    {
+    public function index(
+        HttpFoundation\Request $request
+    ): HttpFoundation\Response {
         $form = $this->createForm(Type\FilterEmailType::class);
         $form->handleRequest($request);
 
         $results = [];
+        $errors = [];
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $format = explode('|', $data['format']);
-            $lengthFormat = count($format);
+            $outputFormat = explode('|', $data['output_format']);
 
-            $lstFilter = trim($data['lst_filter'] ?? '');
+            /** @var $uploadFile UploadedFile */
+            $uploadFile = $data['upload_file'];
+
+            $fileUploader = $this->get('component_core_file_uploader');
+            $phpSpreadsheetService = $this->get('component_core_php_spreadsheet_service');
+            $file = $fileUploader->upload($uploadFile);
+
             $supportDomains = $data['support_domains'] ?? [];
-
-            $lines = preg_split('~[\r\n\s]+~', $lstFilter);
-
             $regexPattern = '/^([a-z][a-z0-9_\.\+]{3,39}@(%s))/';
 
-            foreach ($supportDomains as $supportDomain) {
-                $results[$supportDomain] = [];
-            }
+            try {
+                $rows = $phpSpreadsheetService->readFile($file);
 
-            foreach ($lines as $line) {
-                $line = array_pad(explode('|', $line), $lengthFormat, null);
-                $data = array_combine($format, $line);
-                if (filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                    foreach ($supportDomains as $supportDomain) {
-                        $regex = sprintf($regexPattern, trim($supportDomain, '*'));
-                        if (preg_match($regex, $data['email'])) {
-                            $results[$supportDomain][] = implode('|', $line);
+                $header = array_map('strtolower', $rows[0]);
+                unset($rows[0]);
+
+                foreach ($rows as $row) {
+                    $dataOutputFormat = [];
+                    $record = array_combine($header, $row);
+                    if (empty($record['email'])) {
+                        continue;
+                    }
+                    if (filter_var($record['email'], FILTER_VALIDATE_EMAIL)) {
+                        foreach ($supportDomains as $supportDomain) {
+                            $regex = sprintf($regexPattern, trim($supportDomain, '*'));
+                            if (preg_match($regex, $record['email'])) {
+                                foreach ($outputFormat as $format) {
+                                    $dataOutputFormat[] = $record[$format];
+                                }
+
+                                $results[$supportDomain][] = implode('|', $dataOutputFormat);
+                            }
                         }
                     }
                 }
+            } catch (Exception $e) {
+                $errors[] = $e->getMessage();
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+                $errors[] = $e->getMessage();
             }
         }
 
         return $this->render('tools/filter_email.html.twig', [
             'form' => $form->createView(),
             'results' => $results,
+            'errors' => $errors,
         ]);
     }
 }

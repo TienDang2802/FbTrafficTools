@@ -1,0 +1,12 @@
+services:
+    component_core_file_uploader:
+        class: App\Component\Core\Uploader\FileUploader
+        public: true
+        arguments:
+            $targetDir: '%file_upload_dir%'
+            
+    component_core_php_spreadsheet_service:
+        class: App\Component\Core\PhpSpreadsheet\PhpSpreadsheetService
+        public: true
+        arguments:
+            $client: '@phpspreadsheet'
