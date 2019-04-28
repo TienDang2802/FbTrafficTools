@@ -5,6 +5,8 @@ namespace App\Controller\Tools;
 use App\Form\Type;
 use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
@@ -43,9 +45,31 @@ class FilterEmailController extends Controller
             $fileUploader = $this->get('component_core_file_uploader');
             $phpSpreadsheetService = $this->get('component_core_php_spreadsheet_service');
             $file = $fileUploader->upload($uploadFile);
+            $dirUploadFile = $file->getRealPath();
 
             $supportDomains = $data['support_domains'] ?? [];
             $regexPattern = '/^([a-z][a-z0-9_\.\+]{3,39}@(%s))/';
+
+            $filesystem = new Filesystem();
+
+            $mimeType = $file->getMimeType();
+            $dirUploadZip = null;
+            if ($file->getExtension() && in_array($mimeType, ['application/zip'])) {
+                $zip = new \ZipArchive;
+                if ($zip->open($file->getRealPath()) === true) {
+                    $dirUploadZip = $this->getParameter('file_upload_dir') . '/zip';
+                    $zip->extractTo($dirUploadZip);
+                    $zip->close();
+
+                    $finder = new Finder();
+                    $finder->in($dirUploadZip)->exclude('__MACOSX');
+
+                    /** @var SplFileInfo $fileExtract */
+                    foreach ($finder->files()->name(['*.xlsx', '*.xls']) as $fileExtract) {
+                        $file = new HttpFoundation\File\File($fileExtract->getRealPath());
+                    }
+                }
+            }
 
             try {
                 $rows = $phpSpreadsheetService->readFile($file);
@@ -73,8 +97,10 @@ class FilterEmailController extends Controller
                     }
                 }
 
-                $filesystem = new Filesystem();
-                $filesystem->remove($uploadFile->getRealPath());
+                $filesystem->remove($dirUploadFile);
+                if ($dirUploadZip) {
+                    $filesystem->remove($dirUploadZip);
+                }
             } catch (Exception $e) {
                 $errors[] = $e->getMessage();
             } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
