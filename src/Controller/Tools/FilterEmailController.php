@@ -35,6 +35,7 @@ class FilterEmailController extends Controller
 
         $results = [];
         $errors = [];
+        var_dump($form->isSubmitted(), $form->isValid());
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             var_dump($data);die;
