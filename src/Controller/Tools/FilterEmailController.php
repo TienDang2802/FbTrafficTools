@@ -73,7 +73,7 @@ class FilterEmailController extends Controller
 
             try {
                 $rows = $phpSpreadsheetService->readFile($file);
-                dump($rows);die;
+                var_dump($rows);die;
 
                 $header = array_map('strtolower', $rows[0]);
                 unset($rows[0]);
@@ -103,6 +103,7 @@ class FilterEmailController extends Controller
                     $filesystem->remove($dirUploadZip);
                 }
             } catch (Exception $e) {
+                var_dump($e->getMessage());die;
                 $errors[] = $e->getMessage();
             } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
                 $errors[] = $e->getMessage();
