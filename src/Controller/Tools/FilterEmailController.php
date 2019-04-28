@@ -37,12 +37,11 @@ class FilterEmailController extends Controller
         $errors = [];
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
+            var_dump($data);die;
             $outputFormat = explode('|', $data['output_format']);
 
             /** @var $uploadFile UploadedFile */
             $uploadFile = $data['upload_file'];
-
-            var_dump($uploadFile);die;
 
             $fileUploader = $this->get('component_core_file_uploader');
             $phpSpreadsheetService = $this->get('component_core_php_spreadsheet_service');
