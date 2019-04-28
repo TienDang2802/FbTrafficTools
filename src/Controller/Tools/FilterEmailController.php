@@ -54,6 +54,7 @@ class FilterEmailController extends Controller
 
             $mimeType = $file->getMimeType();
             $dirUploadZip = null;
+            var_dump($mimeType);die;
             if ($file->getExtension() && in_array($mimeType, ['application/zip'])) {
                 $zip = new \ZipArchive;
                 if ($zip->open($file->getRealPath()) === true) {
@@ -73,7 +74,6 @@ class FilterEmailController extends Controller
 
             try {
                 $rows = $phpSpreadsheetService->readFile($file);
-                var_dump($rows);die;
 
                 $header = array_map('strtolower', $rows[0]);
                 unset($rows[0]);
@@ -103,7 +103,6 @@ class FilterEmailController extends Controller
                     $filesystem->remove($dirUploadZip);
                 }
             } catch (Exception $e) {
-                var_dump($e->getMessage());die;
                 $errors[] = $e->getMessage();
             } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
                 $errors[] = $e->getMessage();
