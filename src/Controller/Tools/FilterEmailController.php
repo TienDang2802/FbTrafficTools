@@ -42,6 +42,8 @@ class FilterEmailController extends Controller
             /** @var $uploadFile UploadedFile */
             $uploadFile = $data['upload_file'];
 
+            var_dump($uploadFile);die;
+
             $fileUploader = $this->get('component_core_file_uploader');
             $phpSpreadsheetService = $this->get('component_core_php_spreadsheet_service');
             $file = $fileUploader->upload($uploadFile);
@@ -54,7 +56,7 @@ class FilterEmailController extends Controller
 
             $mimeType = $file->getMimeType();
             $dirUploadZip = null;
-            var_dump($mimeType);die;
+
             if ($file->getExtension() && in_array($mimeType, ['application/zip'])) {
                 $zip = new \ZipArchive;
                 if ($zip->open($file->getRealPath()) === true) {
