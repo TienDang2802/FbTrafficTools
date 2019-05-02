@@ -97,15 +97,15 @@ class FilterEmailController extends Controller
                         }
                     }
                 }
-
-                $filesystem->remove($dirUploadFile);
-                if ($dirUploadZip) {
-                    $filesystem->remove($dirUploadZip);
-                }
             } catch (Exception $e) {
                 $errors[] = $e->getMessage();
             } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
                 $errors[] = $e->getMessage();
+            }
+
+            $filesystem->remove($dirUploadFile);
+            if ($dirUploadZip) {
+                $filesystem->remove($dirUploadZip);
             }
         }
 
