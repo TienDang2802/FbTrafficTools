@@ -35,6 +35,10 @@ class FilterEmailController extends Controller
 
         $results = [];
         $errors = [];
+
+        $filesystem = new Filesystem();
+        $filesystem->remove($this->getParameter('file_upload_dir'));
+
         if ($form->isSubmitted()) {
             $data = $form->getData();
             $outputFormat = explode('|', $data['output_format']);
@@ -49,8 +53,6 @@ class FilterEmailController extends Controller
 
             $supportDomains = $data['support_domains'] ?? [];
             $regexPattern = '/^([a-z][a-z0-9_\.\+]{3,39}@(%s))/';
-
-            $filesystem = new Filesystem();
 
             $mimeType = $file->getMimeType();
             $dirUploadZip = null;
